@@ -1,0 +1,50 @@
+#replacing values in a raster using a polygon
+
+#function
+
+ras.replace <- function (ras, poly = boundr , new.v =-10 , method = "replace") {
+  
+  #par validation
+  match.arg(method, c("add","replace"))
+  
+  #create raster mask using polygon
+  ras_mask <- mask(ras, poly) 
+  plot(ras_mask)
+  
+  #add or replace with new values
+  if (method == "add") {
+    ras_mask <- ras_mask + new.v
+  } else if (method == "replace") {
+    ras_mask[!is.na(ras_mask)] <- new.v
+  }
+  
+  #merge them together
+  ras_new <- overlay(x = ras_mask, y = ras, fun = function (x,y) {
+    x[is.na(x)] = y[is.na(x)]
+    return(x)
+  } )
+  
+  #return new raster
+  return(ras_new)
+}
+
+#application
+ras_ori <- raster("./Data/tomorrowville/tomorrowville_no_buildings.tif") # raster file
+builds <- readOGR(dsn = "./Data/tomorrowville/BUILDINGS", layer = "TV0_BUILDINGS_with_FR_CRVs") #polygon file
+attr_name <- "BLD_HEIGHT" #attribute which gives the polygon heights
+
+build.h <- unique(builds@data %>% dplyr::pull(attr_name))
+
+for (i in build.h) {
+  
+  if (i == build.h[1]) {
+    ras_n <- ras_ori
+  }
+  
+  builds.n <- builds[builds[[attr_name]] == i,]
+  #plot(builds.n)
+  
+  ras_n <- ras.replace(ras = ras_n, poly = builds.n , new.v = i , method = "add")
+
+  
+}
