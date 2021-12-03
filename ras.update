@@ -1,0 +1,57 @@
+#updating values in a raster using a polygon
+
+#function
+
+ras.update <- function (ras, poly, new.v =-10 , method = "replace") {
+  
+  #ras - raster (any raster format)
+  #poly - polygon (spatialpolygonsdataframe) 
+  #new.v - numeric. New raster values to use inside the polygon
+  #method = string to indicate the method to be used to update the values. 
+  #         There are two methods available "add" or "replace". "add" will add the new.v to the raster values, "replace" will replace old values with new.v 
+  
+  
+  #par validation
+  match.arg(method, c("add","replace"))
+  
+  #create raster mask using polygon
+  ras_mask <- mask(ras, poly) 
+  plot(ras_mask)
+  
+  #add or replace with new values
+  if (method == "add") {
+    ras_mask <- ras_mask + new.v
+  } else if (method == "replace") {
+    ras_mask[!is.na(ras_mask)] <- new.v
+  }
+  
+  #merge them together
+  ras_new <- overlay(x = ras_mask, y = ras, fun = function (x,y) {
+    x[is.na(x)] = y[is.na(x)]
+    return(x)
+  } )
+  
+  #return new raster
+  return(ras_new)
+}
+
+#application
+ras_ori <- raster("./path/to/the/raster/file") # raster file
+builds <- readOGR(dsn = "./path/to/the/polygon/file"), layer = "name of the file") #polygon file
+attr_name <- "attr_name" #attribute which gives the polygon heights
+
+build.h <- unique(builds@data %>% dplyr::pull(attr_name))
+
+for (i in build.h) {
+  
+  if (i == build.h[1]) {
+    ras_n <- ras_ori
+  }
+  
+  builds.n <- builds[builds[[attr_name]] == i,]
+  #plot(builds.n)
+  
+  ras_n <- ras.update(ras = ras_n, poly = builds.n , new.v = i , method = "add")
+
+  
+}
