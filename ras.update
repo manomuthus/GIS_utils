@@ -38,7 +38,7 @@ ras.update <- function (ras, poly, new.v =-10 , method = "replace") {
 #application
 ras_ori <- raster("./path/to/the/raster/file") # raster file
 builds <- readOGR(dsn = "./path/to/the/polygon/file"), layer = "name of the file") #polygon file
-attr_name <- "attr_name" #attribute which gives the polygon heights
+attr_name <- "attr_name" #string to indicate the attribute which gives the polygon heights
 
 build.h <- unique(builds@data %>% dplyr::pull(attr_name))
 
