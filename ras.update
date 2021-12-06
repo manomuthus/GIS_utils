@@ -1,4 +1,10 @@
-#updating values of raster cells using a polygon
+                                                 #updating values of raster cells using a polygon
+#####loading libraries#####
+
+if ( !require(raster) )    { install.packages("raster");    library(raster) }
+if ( !require(rgdal) )    { install.packages("rgdal");    library(rgdal) }
+if ( !require(dplyr) )    { install.packages("dplyr");    library(dplyr) }
+
 
 #####function#####
 
