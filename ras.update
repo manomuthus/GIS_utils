@@ -1,12 +1,12 @@
-#updating values in a raster using a polygon
+#updating values of raster cells using a polygon
 
-#function
+#####function#####
 
 ras.update <- function (ras, poly, new.v =-10 , method = "replace") {
   
-  #ras - raster (any raster format)
-  #poly - polygon (spatialpolygonsdataframe) 
-  #new.v - numeric. New raster values to use inside the polygon
+  #ras - any raster file
+  #poly - spatialpolygonsdataframe 
+  #new.v - numeric. New raster value to be used inside the polygon
   #method = string to indicate the method to be used to update the values. 
   #         There are two methods available "add" or "replace". "add" will add the new.v to the raster values, "replace" will replace old values with new.v 
   
@@ -35,12 +35,19 @@ ras.update <- function (ras, poly, new.v =-10 , method = "replace") {
   return(ras_new)
 }
 
-#application
+######application#####
+
+#Example application - Automating the process of adding building heights into a DEM. 
+#The script basically reads the building footprint and heights from a shapefile and incorporate them into the provided DEM
+
+
 ras_ori <- raster("./path/to/the/raster/file") # raster file
-builds <- readOGR(dsn = "./path/to/the/polygon/file"), layer = "name of the file") #polygon file
+builds <- readOGR(dsn = "./path/to/the/polygon/folder"), layer = "name of the file") #polygon file
 attr_name <- "attr_name" #string to indicate the attribute which gives the polygon heights
 
-build.h <- unique(builds@data %>% dplyr::pull(attr_name))
+build.h <- unique(builds@data %>% dplyr::pull(attr_name)) # extracting building heights to make a for-loop operation
+
+#loop operation starts here. ras.update is repeatedly applied to all the building footprints grouped using thier heights. ras_n is the updated DEM with updated building heights
 
 for (i in build.h) {
   
