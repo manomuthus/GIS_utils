@@ -1,4 +1,4 @@
-                                                 #updating values of raster cells using a polygon
+                                                 #updating values of raster cells with in an area enclosed by a polygon
 #####loading libraries#####
 
 if ( !require(raster) )    { install.packages("raster");    library(raster) }
