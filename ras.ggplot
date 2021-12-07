@@ -1,7 +1,6 @@
                                           #plotting a raster using ggplot with optional OSM background
 ####loading libraries####
 if ( !require(raster) )    { install.packages("raster");    library(raster) }
-if ( !require(rgeos) )    { install.packages("rgeos");    library(rgeos) }
 if ( !require(ggplot2) )    { install.packages("ggplot2");    library(ggplot2) }
 if ( !require(ggspatial) )    { install.packages("ggspatial");    library(ggspatial) }
 if ( !require(OpenStreetMap) )    { install.packages("OpenStreetMap");    library(OpenStreetMap) }
