@@ -1,0 +1,59 @@
+                                          #plotting a raster using ggplot with optional OSM background
+####loading libraries####
+if ( !require(raster) )    { install.packages("raster");    library(raster) }
+if ( !require(rgeos) )    { install.packages("rgeos");    library(rgeos) }
+if ( !require(ggplot2) )    { install.packages("ggplot2");    library(ggplot2) }
+if ( !require(ggspatial) )    { install.packages("ggspatial");    library(ggspatial) }
+if ( !require(OpenStreetMap) )    { install.packages("OpenStreetMap");    library(OpenStreetMap) }
+
+
+#####function#####
+ggplotras <- function (ras, #raster file to be plotted
+                       base.osm = NULL, #background osm map if needed (check ?openmap to import an osm map) - will be cropped using ras (deault: no plot)
+                       par.name = "Elevation", units = "m", #just needed for the legend title (deault: "Elevation [m]")
+                       col.pal = rev(RColorBrewer::brewer.pal(11,"Spectral")), #color palette for the plot
+                       p.title = NULL, #plot title (string) (default: no title)
+                       pos.scale = "br" #position of the scale bar and north arrow (default: bottomright (br))
+                       ) {
+  
+  ras.df <- rasterToPoints(ras)
+  ras.df <- data.frame(ras.df)
+  colnames(ras.df) <- c("long", "lat", par.name)
+    
+  p1 <-if (is.null(base.osm)) ggplot() else autoplot.OpenStreetMap(base.osm) 
+  
+  p2 <- p1 +
+    geom_raster(data = ras.df, aes_string(x="long", y="lat",
+                                          fill = par.name)) +
+    scale_fill_gradientn(colours = col.pal) +
+    coord_fixed(ratio = 1, xlim=range(ras.df$long), ylim=range(ras.df$lat)) +
+    scale_x_continuous(expand = c(0, 0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    labs(title = p.title) +
+    labs(fill=paste0(par.name," [", units, "]")) +
+    annotation_scale(location = pos.scale, width_hint = 0.5) +
+    annotation_north_arrow(
+      location = pos.scale, which_north = "true",
+      height = unit(1, "cm"),
+      width = unit(1, "cm"),
+      pad_y = unit(0.5, "cm"),
+      style = north_arrow_fancy_orienteering) +
+    theme(panel.grid = element_blank(),
+          legend.position = "right",
+          legend.title = element_text(face="bold",size=8),
+          legend.text  =element_text(face="bold",size=8),
+          axis.text = element_text(size=7),
+          axis.title = element_blank())
+  
+  p2
+  return(p2)
+}
+
+#note: you can load an OSM map as follows (e.g. Khokana region in Kathamandu)
+if ( !require(dplyr) )    { install.packages("dplyr");    library(dplyr) } #to use piping operator
+
+omap <- openmap(upperLeft = c(27.65519,  85.28222), 
+                     lowerRight = c(27.63136, 85.30494),
+                     zoom = NULL,
+                     type="osm") %>% 
+  openproj("+proj=utm +zone=45 ellps=WGS84") #to project it to the required coordinate system
