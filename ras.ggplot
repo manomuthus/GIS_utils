@@ -8,7 +8,7 @@ if ( !require(OpenStreetMap) )    { install.packages("OpenStreetMap");    librar
 
 
 #####function#####
-ggplotras <- function (ras, #raster file to be plotted
+ras.ggplot <- function (ras, #raster file to be plotted
                        base.osm = NULL, #background osm map if needed (check ?openmap to import an osm map) - will be cropped using ras (deault: no plot)
                        par.name = "Elevation", units = "m", #just needed for the legend title (deault: "Elevation [m]")
                        col.pal = rev(RColorBrewer::brewer.pal(11,"Spectral")), #color palette for the plot
